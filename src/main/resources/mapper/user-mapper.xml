@@ -14,6 +14,14 @@
         select <include refid="sqlParam"></include> from user where id = #{id}
     </select>
 
+    <select id="getUserByName" resultType="User">
+        select <include refid="sqlParam"></include> from user where username = #{username}
+    </select>
+
+    <select id="getUserByEmail" resultType="User">
+        select <include refid="sqlParam"></include> from user where email = #{email}
+    </select>
+
     <insert id="insertUser" parameterType="User" keyProperty="id">
         insert into user (<include refid="sqlParam2"></include>)values(#{username},#{password},#{salt},#{email}
         ,#{type},#{status},#{activationCode},#{headerUrl},#{createTime})
@@ -22,6 +30,19 @@
     <update id="updateUserByid">
         update user set username=#{username} where id=#{id}
     </update>
+
+    <update id="updateUserStatus">
+        update user set status=#{status} where id=#{id}
+    </update>
+
+    <update id="updateUserHeader">
+        update user set header_url=#{headerUrl} where id=#{id}
+    </update>
+
+    <update id="updateUserPassWord">
+        update user set password=#{password} where id=#{id}
+    </update>
+
 
     <delete id="delteUserByid">
         delete from user where id = #{id}

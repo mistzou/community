@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/home/")
 public class HomeController {
 
     @Autowired
@@ -28,7 +27,7 @@ public class HomeController {
     @RequestMapping(path = "index",method = RequestMethod.GET)
     public String index(Model model, Page page){
         page.setRows(discussPostService.getDiscussPostRows(0));
-        page.setPath("/home/index");
+        page.setPath("index");
         List<DiscussPost> list = discussPostService.getDiscussPostList(0, page.getOffset(), page.getLimit());
         List<Map<String,Object>> discussPostList = new ArrayList<>();
         for (DiscussPost post: list) {
