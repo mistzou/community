@@ -69,6 +69,11 @@ class CommunityApplicationTests implements ApplicationContextAware {
 	}
 
 
+	@Test
+	public void test2(){
+		String a = alphaService.save2();
+		System.out.println(a);
+	}
 
 
 

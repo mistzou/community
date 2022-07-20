@@ -2,7 +2,10 @@ package com.nowcoder.community.controller;
 
 import com.nowcoder.community.annotation.LoginRequired;
 import com.nowcoder.community.entity.User;
+import com.nowcoder.community.service.FollowService;
+import com.nowcoder.community.service.LikeService;
 import com.nowcoder.community.service.UserService;
+import com.nowcoder.community.utils.CommunityConstant;
 import com.nowcoder.community.utils.CommunityUtil;
 import com.nowcoder.community.utils.HostHolder;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +28,7 @@ import java.io.OutputStream;
 
 @Controller
 @RequestMapping("/user/")
-public class UserController {
+public class UserController implements CommunityConstant {
 
     private Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -43,6 +46,12 @@ public class UserController {
 
     @Value("${server.servlet.context-path}")
     private String contextPath;
+
+    @Autowired
+    private LikeService likeService;
+
+    @Autowired
+    private FollowService followService;
 
     @LoginRequired
     @RequestMapping(path = "setting",method = RequestMethod.GET)
@@ -136,6 +145,38 @@ public class UserController {
         newPassWord = CommunityUtil.md5(newPassWord+user.getSalt());
         userService.updateUserPassWord(user.getId(),newPassWord);
         return "redirect:/logout";
+    }
+
+    @RequestMapping("/profile/{userId}")
+    public String getProfile(@PathVariable("userId")int userId,Model model){
+        User user = userService.getUserById(userId);
+        if(user == null){
+            throw new RuntimeException("该用户不存在！");
+        }
+
+        model.addAttribute("user",user);
+
+        //获得多少个赞
+        long likeCount = likeService.findUserLikeCount(userId);
+
+        long setLikeCount = likeService.findUserSetLikeCount(userId);
+
+        model.addAttribute("likeCount",likeCount);
+
+        model.addAttribute("setLikeCount",setLikeCount);
+
+        //查询用户的关注数量
+        model.addAttribute("followeeCount",followService.findFolloweeCount(userId,ENTITY_TYPE_USER));
+        //查询用户的粉丝数量
+        model.addAttribute("followerCount",followService.findFollowerCount(ENTITY_TYPE_USER,userId));
+
+        //判断该用户是否被关注
+        boolean followed = false;
+        if(hostHolder.getUser() != null){
+            followed = followService.hasFollowed(hostHolder.getUser().getId(),ENTITY_TYPE_USER,userId);
+        }
+        model.addAttribute("followed",followed);
+        return "/site/profile";
     }
 
 }
